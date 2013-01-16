@@ -37,7 +37,7 @@
 			include.loaded.push(url);
 			
 			// Do load.
-			include.fileExtensions[extension](url);
+			include.loaders[extension](url);
 		}
 	}
 	
@@ -97,12 +97,12 @@
 		/**
 		 * Get the extension of specified url.
 		 * @return {String} The extension that starts with a dot. If the actual 
-		 * extension is not a member of include.fileExtensions, it returns ".html" 
+		 * extension is not a member of include.loaders, it returns ".html" 
 		 * by default.
 		 */
 		getExtension: function(url) {
 			var match = /\.\w+$/.exec(url);
-			return match && (match[0] in include.fileExtensions) ? match[0] : ".html";
+			return match && (match[0] in include.loaders) ? match[0] : ".html";
 		},
 		
 		/**
@@ -179,7 +179,7 @@
 		/**
 		 * All supported loaders for variant extensions.
 		 */
-		fileExtensions: {
+		loaders: {
 			'.js': function(url) {
 				var sourceCode = include.getText(url);
 
