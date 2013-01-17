@@ -62,22 +62,32 @@ Demo.Dpl.listToTree = function (list) {
 
 	var tree = {
 
-	}, path, category, slash;
+	}, path, category, slash, version, data;
 
 	for (path in list) {
 		
 		slash = path.lastIndexOf('/');
 
-		// 删除扩展名、版本号。
+		// 删除扩展名。
 		category = slash < 0 ? '全局' : path.substr(0, slash);
-		fileNameWithoutExtension = (slash < 0 ? path : path.substr(slash + 1)).replace(/(-[\.\d]+)?\.\w+$/, "");
+		fileNameWithoutExtension = (slash < 0 ? path : path.substr(slash + 1)).replace(/\.\w+$/, "");
 
-		if(!tree[category]) {
-			tree[category] = {};
-		}
+		version = 0;
 
-		if (!tree[category][fileNameWithoutExtension]) {
-			tree[category][fileNameWithoutExtension] = path;
+		// 检测是否存在版本号。
+		fileNameWithoutExtension = fileNameWithoutExtension.replace(/\-([\d\.]+)$/, function (_, v) {
+			list[path].version = list[path].version || v;
+			list[path].versionValue = version = parseFloat(v);
+			return "";
+		});
+
+
+		data = tree[category] || (tree[category] = {});
+		
+		if (!data[fileNameWithoutExtension]) {
+			data[fileNameWithoutExtension] = path;
+		} else if (version && !(list[data[fileNameWithoutExtension]].versionValue > version)) {
+			data[fileNameWithoutExtension] = path;
 		}
 
 	}
@@ -138,7 +148,7 @@ Demo.writeDplList = function () {
 
 			url = Demo.baseUrl + Demo.Configs.examples + "/" + data[name];
 
-			html += '<li style="margin:0;list-style:disc inside;color:#E2E2EB;font-size:14px;line-height:24px;height:24px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;"><a class="demo status-' + info.status + (from === url ? ' current' : '') + '" href="' + url + '" title="' + name + '&#13;&#10;版本：' + (info.version || "1.0") + '&#13;&#10;名字：' + info.name + '&#13;&#10;状态：' + (Demo.Configs.status[info.status] || '已完成') + '">' + name + '</a><small style="color: #999999;"> - ' + info.name + '</small></li>';
+			html += '<li style="margin:0;list-style:disc inside;color:#E2E2EB;font-size:14px;line-height:24px;height:24px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;"><a class="demo status-' + info.status + (from === url ? ' current' : '') + '" href="' + url + '" title="' + name + ' ' + (info.version || "1.0") + '&#13;&#10;名字：' + info.name + '&#13;&#10;状态：' + (Demo.Configs.status[info.status] || '已完成') + '">' + name + '</a>' + (info["attr"] ? '<sup class="x-highlight">' + info["attr"] + '</sup>' : '') + '<small style="color: #999999;"> - ' + info.name + '</small></li>';
 
 			if (!counts[info.status]) {
 				counts[info.status] = 1;
@@ -174,7 +184,7 @@ Demo.writeDplList = function () {
 			html += Demo.Configs.status[name] + ": " + counts[name] + "&#13;&#10;";
 		}
 
-		html += '全部: ' + data + '">' + ((counts.ok || 0) + (counts.complete || 0)) + '/' + data + '</small>';
+		html += '全部: ' + data + '">' + ((counts.ok || 0) + (counts.complete || 0)) + '/' + (data - (counts.obsolete || 0)) + '</small>';
 
 		next.innerHTML += html;
 	}
