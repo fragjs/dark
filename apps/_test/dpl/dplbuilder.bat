@@ -1,6 +1,6 @@
 @cd ../../../apps
 :start
-@"node" _test/dplmanager/dplmanager.js
+@"build" _test/dpl/dplbuilder.src.js
 @pause
 @cls
 @goto start

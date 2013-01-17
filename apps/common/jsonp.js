@@ -11,7 +11,7 @@ Demo.jsonp = function (path, data, onSuccess) {
             if (navigator.platform.indexOf("Win") === -1) {
                 r = 'startserver.sh';
             }
-            alert("无法连接到代理服务器\r\n请求地址: " + Demo.Configs.serverRootUrl + path + '\r\n请运行 [项目跟目录]/' + r);
+            alert("本工具需要服务器支持\r\n请求地址: " + Demo.Configs.serverBaseUrl + path + '\r\n请运行 [项目跟目录]/apps/' + r + "，并不要关闭窗口。");
         },
         timeout: 1000
     });
