@@ -455,7 +455,7 @@ if (typeof module !== 'object') {
 					var dplInfo = Demo.dplInfo;
 					dropDown.className = 'demo-toolbar-dropdown';
 					dropDown.style.cssText = 'padding:5px;*width:260px;';
-					var html = '<style>#demo-toolbar-controlstate input{vertical-align: -2px;}</style><form style="*margin-bottom:0" action="' + Demo.Configs.serverBaseUrl + Demo.Configs.apps + '/tools/dpl/server/dplmanager.njs" method="get">\
+					var html = '<style>#demo-toolbar-controlstate input{vertical-align: -2px;}</style><form style="*margin-bottom:0" action="' + Demo.Configs.serverBaseUrl + Demo.Configs.apps + '/dpl/server/dplmanager.njs" method="get">\
                     <fieldset>\
                         <legend>进度</legend>';
 
@@ -491,7 +491,7 @@ if (typeof module !== 'object') {
                 </fieldset>\
 \
                 <input value="保存修改" class="demo-right" type="submit">\
-                <a href="javascript://彻底删除当前组件及相关源码" onclick="if(prompt(\'确定删除当前组件吗?  如果确认请输入 yes\') === \'yes\')location.href=\'' + Demo.Configs.serverBaseUrl + Demo.Configs.apps + '/tools/dpl/server/dplmanager.njs?action=delete&path=' + encodeURIComponent(Demo.dplInfo.path) + '&postback=' + encodeURIComponent(Demo.Configs.serverBaseUrl + Demo.Configs.examples) + '\'">删除组件</a>\
+                <a href="javascript://彻底删除当前组件及相关源码" onclick="if(prompt(\'确定删除当前组件吗?  如果确认请输入 yes\') === \'yes\')location.href=\'' + Demo.Configs.serverBaseUrl + Demo.Configs.apps + '/dpl/server/dplmanager.njs?action=delete&path=' + encodeURIComponent(Demo.dplInfo.path) + '&postback=' + encodeURIComponent(Demo.Configs.serverBaseUrl + Demo.Configs.examples) + '\'">删除组件</a>\
 <input type="hidden" name="path" value="' + Demo.Utils.encodeHTML(location.pathname) + '">\
 <input type="hidden" name="action" value="update">\
 <input type="hidden" name="postback" value="' + Demo.Utils.encodeHTML(location.href) + '">\
@@ -815,7 +815,7 @@ if (typeof module !== 'object') {
 		html += '<a href="javascript://常用文档" onclick="Demo.Page.showDropDown(\'demo-toolbar-doc\', 1);return false;" onmouseover="Demo.Page.showDropDown(\'demo-toolbar-doc\')" onmouseout="Demo.Page.hideDropDown()" accesskey="D">文档' + space + '▾</a> | <a href="javascript://常用工具" onclick="Demo.Page.showDropDown(\'demo-toolbar-tool\', 1);return false;" onmouseover="Demo.Page.showDropDown(\'demo-toolbar-tool\')" onclick="Demo.Page.showDropDown(\'demo-toolbar-tool\', 1);return false;" onmouseout="Demo.Page.hideDropDown()" accesskey="T">工具' + space + '▾</a> | <a href="javascript://快速打开其他组件" onmouseover="Demo.Page.showDropDown(\'demo-toolbar-goto\')" onclick="Demo.Page.showDropDown(\'demo-toolbar-goto\', 1);return false;" onmouseout="Demo.Page.hideDropDown()" accesskey="G">转到' + space + '▾</a> | ';
 
 		if (Demo.local && isInDocs && isHomePage) {
-			html += '<a href="' + configs.serverBaseUrl + configs.apps + '/tools/dpl/server/dplmanager.njs?action=updatelist&postback=' + encodeURIComponent(location.href) + ' " title="刷新组件列表缓存" accesskey="H">刷新列表</a>';
+			html += '<a href="' + configs.serverBaseUrl + configs.apps + '/dpl/server/dplmanager.njs?action=updatelist&postback=' + encodeURIComponent(location.href) + ' " title="刷新组件列表缓存" accesskey="H">刷新列表</a>';
 		} else {
 			html += '<a href="' + Demo.baseUrl + configs.examples + '/index.html" title="返回组件列表" accesskey="H">返回列表</a>';
 		}

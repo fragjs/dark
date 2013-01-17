@@ -1,7 +1,7 @@
 
 
 
-var DplManager = require("../../tools/dpl/server/dplmanager.js");
+var DplManager = require("../../dpl/server/dplmanager.js");
 
 
 
