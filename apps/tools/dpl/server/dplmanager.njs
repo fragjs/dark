@@ -1,16 +1,17 @@
 ﻿// 如果本源码被直接显示，说明使用了其它服务器。
-// 本源码需要使用 xfly 服务器执行。请运行项目跟目录下的 startserver 文件。
+// 本源码需要使用 xfly 服务器执行。
+// 请执行 apps 目录下的 startserver.cmd 文件，并不要关闭本窗口。
 
 var DplManager = require('./dplmanager');
 var res = require('./res');
 
 switch(request.queryString['action']){
 	case 'create':
-		DplManager.createDpl(request.queryString.module, request.queryString.category, request.queryString.name, request.queryString.title);
-		res.redirect(context);
+		var html = DplManager.createDpl(request.queryString.path, request.queryString.tpl, request.queryString.title);
+		res.redirect(context, context.request.queryString.postback || html);
 		break;
 	case 'delete':
-		DplManager.deleteDpl(request.queryString.module, request.queryString.category, request.queryString.name);
+		DplManager.deleteDpl(request.queryString.path);
 		res.redirect(context);
 		break;
 	case 'update':
@@ -19,7 +20,7 @@ switch(request.queryString['action']){
 		};
 
 		if(request.queryString.support) {
-			if(request.queryString.support.length !== require('./system').Configs.support.length){
+			if(request.queryString.support.length !== require('./demo').Configs.support.length){
 				dplInfo.support = request.queryString.support.join("|");
 			} else {
 				dplInfo.support = '';
@@ -30,15 +31,15 @@ switch(request.queryString['action']){
 			dplInfo.hide = request.queryString.hide == "on";
 		}
 
-		DplManager.updateDpl(request.queryString.module, request.queryString.category, request.queryString.name, request.queryString.title, dplInfo);
+		DplManager.updateDplInfo(request.queryString.path, request.queryString.title, dplInfo);
 		res.redirect(context);
 		break;
 	case 'getlist':
-		var list = DplManager.getDplList(request.queryString.type || 'demo');
+		var list = DplManager.getDplList(request.queryString.type || require('./demo').Configs.src);
 		res.writeJsonp(context, list);
 		break;
 	case 'updatelist':
-		DplManager.updateDplList('demo');
+		DplManager.updateDplList();
 		res.redirect(context);
 		break;
 	default:

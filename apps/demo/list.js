@@ -14,9 +14,9 @@ Demo.waterFall = function (column) {
         section,
         min,
         minIndex,
-        baseHeight = 20,
+        baseHeight = 14,
         marginRight = 10,
-        marginBottom = 20,
+        marginBottom = 25,
 		eachWidth,
         columnWidth,
         i,
@@ -42,8 +42,8 @@ Demo.waterFall = function (column) {
             // 第一行不处理。
             for (i = 0; i < column; i++) {
             	if (section = sections[i]) {
-            		section.style.cssText = 'float:left;width:' + eachWidth + 'px;margin-right:' + (i == column - 1 ? 0 : marginRight) + 'px';
-                    heights[i] = baseHeight + section.offsetHeight + marginBottom;
+            		section.style.cssText = 'float:left;width:' + eachWidth + 'px;margin-right:' + (i == column - 1 ? 0 : marginRight) + 'px;margin-top:' + baseHeight + 'px';
+            		heights[i] = baseHeight + section.offsetHeight + marginBottom;
                 }
             }
 
@@ -70,7 +70,7 @@ Demo.waterFall = function (column) {
                 }
             }
 
-            articles[articlesIndex].style.height = max - 20 + 'px';
+            articles[articlesIndex].style.height = max - marginBottom - baseHeight + 'px';
         }
 
     }
@@ -89,15 +89,15 @@ Demo.writeList = function (list, column) {
     	if (isFirst) {
     		isFirst = false;
     		if (data === "-") {
-    			html += '<section class="demo"><h3 class="demo">' + name + '</h3><ul class="demo demo-plain">';
+    			html += '<section class="demo"><h3 class="demo" style="margin-top:0;">' + name + '</h3><ul class="demo demo-plain">';
     			continue;
     		}
-    		html += '<section class="demo"><h3 class="demo">列表</h3><ul class="demo list">';
+    		html += '<section class="demo"><h3 class="demo" style="margin-top:0;">列表</h3><ul class="demo list">';
     	}
 
     	if (data === "-") {
     		html += '</ul></section>';
-    		html += '<section class="demo"><h3 class="demo">' + name + '</h3><ul class="demo demo-plain">';
+    		html += '<section class="demo"><h3 class="demo" style="margin-top:0;">' + name + '</h3><ul class="demo demo-plain">';
     	} else {
     		html += '<li style="margin:0;list-style:disc inside;color:#E2E2EB;font-size:14px;line-height:24px;height:24px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;"><a class="demo" href="' + data.replace(/^~\//, Demo.baseUrl) + '" title="' + name + '">' + name + '</a></li>';
 

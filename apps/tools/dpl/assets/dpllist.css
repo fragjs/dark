@@ -5,12 +5,12 @@
     text-shadow: 0 0 1px #0088CC;
 }
 
-.textbox-category {
-    width: 100px;
+.textbox-path {
+    width: 300px;
 }
 
 .textbox-name {
-    width: 120px;
+    width: 100px;
 }
 
 html a.status-beta {

@@ -1,6 +1,6 @@
 @cd ../../../apps
 :start
-@"supervisor" "server/startserver.js"
+@"node" _test/dplmanager/dplmanager.js
 @pause
 @cls
 @goto start

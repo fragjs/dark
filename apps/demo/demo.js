@@ -14,7 +14,7 @@ Demo.Configs = {
 	/**
 	 * 当前演示系统在处理文件操作时使用的远程服务器地址。
 	 */
-	serverbaseUrl: 'http://localhost:8021/',
+	serverBaseUrl: 'http://localhost:8021/',
 
 	/**
 	 * 存放源文件的文件夹。
@@ -24,7 +24,7 @@ Demo.Configs = {
 	/**
 	 * 存放文档文件的文件夹。
 	 */
-	docs: "docs",
+	examples: "examples",
 
 	/**
 	 * 存放演示系统文件的文件夹。
@@ -128,87 +128,13 @@ Demo.Dpl = {
 	},
 
 	/**
-     * 将模块名转换为可访问的地址。
+     * 将 URL 转换为模块名。
      */
-	toDocUrl: function (modulePath) {
-		return Demo.Configs.docs + "/" + modulePath + ".html";
-	},
-
-	toModulePath: function (url) {
-		return url.replace(/\.html.*$/, "").toLowerCase();
+	toModulePath: function (path) {
+		return path ? path.replace(/\.\w+$/, "").replace(/^[\/\\]+/, "").replace(/[\/\\]+$/, "").toLowerCase() : "";
 	}
 
 };
-
-///**
-// * 复制对象的所有属性到其它对象。
-// * @param {Object} dest 复制的目标对象。
-// * @param {Object} src 复制的源对象。
-// */
-//Demo.extend = function (dest, src) {
-//	for (var i in src) {
-//		dest[i] = src[i];
-//	}
-//};
-
-//Demo.extend(Demo, {
-
-//	/**
-//     * System.Dom.Base => System, Dom, Base
-//     */
-//	splitPath: function (path) {
-//		var r = {}, left = path.indexOf('.'), right = path.indexOf('.', left + 1);
-//		if (left === -1) {
-//			r.module = path;
-//			r.category = '';
-//			r.name = '';
-//		} else if (right == -1) {
-//			r.module = path.substring(0, left);
-//			r.category = path.substring(left + 1);
-//			r.name = '';
-//		} else {
-//			r.module = path.substring(0, left);
-//			r.category = path.substring(left + 1, right);
-//			r.name = path.substring(right + 1);
-//		}
-//		return r;
-//	},
-
-//	/**
-//     * 根据组件路径获取组件的演示页地址。
-//     */
-//	getDemoUrl: function (dplPath) {
-//		return Demo.Configs.baseUrl + Demo.Configs.demo + '/' + dplPath.replace(/\./g, "/") + ".html";
-//	},
-
-//	/**
-//     * 根据文件名获取组件的路径。
-//     */
-//	toDplPath: function (fileName) {
-
-//		return fileName.replace('/assets/', '/').replace('/scripts/', '/').replace('/styles/', '/').replace(/\.html([#?].*)?$/, '').replace(/\.\w+$/, '').replace(/\//g, '.');
-//	},
-
-//	/**
-//     * 将列表转为树结构方便遍历。
-//     */
-//	listToTree: function (list) {
-
-//		var tree = {}, path, t;
-
-//		for (path in list) {
-//			var split = Demo.splitPath(path);
-
-//			t = tree[split.module] || (tree[split.module] = {});
-//			t = t[split.category] || (t[split.category] = {});
-
-//			t[split.name] = path;
-//		}
-
-//		return tree;
-//	}
-
-//});
 
 /// #endregion
 
@@ -526,11 +452,10 @@ if (typeof module !== 'object') {
 
 					break;
 				case "demo-toolbar-controlstate":
-					var dplInfo = Demo.Configs.dplInfo;
-					var n = Demo.splitPath(dplInfo.path);
+					var dplInfo = Demo.dplInfo;
 					dropDown.className = 'demo-toolbar-dropdown';
 					dropDown.style.cssText = 'padding:5px;*width:260px;';
-					var html = '<style>#demo-toolbar-controlstate input{vertical-align: -2px;}</style><form style="*margin-bottom:0" action="' + Demo.Configs.serverbaseUrl + Demo.Configs.apiPath + 'dplmanager.njs" method="get">\
+					var html = '<style>#demo-toolbar-controlstate input{vertical-align: -2px;}</style><form style="*margin-bottom:0" action="' + Demo.Configs.serverBaseUrl + Demo.Configs.apps + '/tools/dpl/server/dplmanager.njs" method="get">\
                     <fieldset>\
                         <legend>进度</legend>';
 
@@ -566,12 +491,10 @@ if (typeof module !== 'object') {
                 </fieldset>\
 \
                 <input value="保存修改" class="demo-right" type="submit">\
-                <a href="javascript://彻底删除当前组件及相关源码" onclick="if(prompt(\'确定删除当前组件吗?  如果确认请输入 yes\') === \'yes\')location.href=\'' + Demo.Configs.serverbaseUrl + Demo.Configs.apiPath + 'dplmanager.njs?action=delete&module=' + n.module + '&category=' + n.category + '&name=' + n.name + '&postback=' + encodeURIComponent(Demo.Configs.baseUrl + Demo.Configs.demo + '/index.html') + '\'">删除组件</a>\
-<input type="hidden" name="module" value="' + n.module + '">\
-<input type="hidden" name="category" value="' + n.category + '">\
-<input type="hidden" name="name" value="' + n.name + '">\
+                <a href="javascript://彻底删除当前组件及相关源码" onclick="if(prompt(\'确定删除当前组件吗?  如果确认请输入 yes\') === \'yes\')location.href=\'' + Demo.Configs.serverBaseUrl + Demo.Configs.apps + '/tools/dpl/server/dplmanager.njs?action=delete&path=' + encodeURIComponent(Demo.dplInfo.path) + '&postback=' + encodeURIComponent(Demo.Configs.serverBaseUrl + Demo.Configs.examples) + '\'">删除组件</a>\
+<input type="hidden" name="path" value="' + Demo.Utils.encodeHTML(location.pathname) + '">\
 <input type="hidden" name="action" value="update">\
-<input type="hidden" name="postback" value="' + location.href + '">\
+<input type="hidden" name="postback" value="' + Demo.Utils.encodeHTML(location.href) + '">\
             </form>';
 					dropDown.innerHTML = html;
 					break;
@@ -728,10 +651,10 @@ if (typeof module !== 'object') {
 
 			if (filter) {
 				filter = filter.replace(/^\s+|\s+$/g, "").toLowerCase();
-				for (var path in DplList) {
+				for (var path in DplList.examples) {
 					if (path.indexOf('/' + filter) >= 0) {
 						html += getTpl(path);
-					} else if (path.indexOf(filter) >= 0 || DplList[path].name.toLowerCase().indexOf(filter) >= 0) {
+					} else if (path.indexOf(filter) >= 0 || DplList.examples[path].name.toLowerCase().indexOf(filter) >= 0) {
 						html2 += getTpl(path);
 					}
 				}
@@ -740,7 +663,7 @@ if (typeof module !== 'object') {
 				if (histories = window.localStorage && localStorage.demoDplHistory) {
 					histories = histories.split(';');
 					for (var i = histories.length - 1; i >= 0; i--) {
-						if (histories[i] in DplList) {
+						if (histories[i] in DplList.examples) {
 							html += getTpl(histories[i]);
 						}
 					}
@@ -748,7 +671,7 @@ if (typeof module !== 'object') {
 					sep = !!html;
 				}
 
-				for (var path in DplList) {
+				for (var path in DplList.examples) {
 					html2 += getTpl(path);
 				}
 			}
@@ -759,7 +682,7 @@ if (typeof module !== 'object') {
 					tpl = ' style="border-top: 1px solid #EBEBEB"';
 					sep = false;
 				}
-				return '<a' + tpl + ' onmouseover="Demo.Page.gotoSetListHover(this)" href="' + Demo.baseUrl + Demo.Dpl.toDocUrl(path) + '">' + path + '<small style="color: #999"> - ' + DplList[path].name + '</small></a>';
+				return '<a' + tpl + ' onmouseover="Demo.Page.gotoSetListHover(this)" href="' + Demo.baseUrl + Demo.Configs.examples + "/" + path + '">' + path + '<small style="color: #999"> - ' + DplList.examples[path].name + '</small></a>';
 			}
 
 			dropDown.lastChild.innerHTML = html + html2;
@@ -818,8 +741,8 @@ if (typeof module !== 'object') {
 			node = document.getElementsByTagName("meta"),
 			i,
 			dplInfo,
-			isInDocs = Demo.urlPrefix === configs.docs,
-			isHomePage = /^index\./.test(Demo.urlPostfix);
+			isInDocs = Demo.urlPrefix === configs.examples,
+			isHomePage = !Demo.urlPostfix || /^index\./.test(Demo.urlPostfix);
 
 		// 生成 dplInfo 字段。
 
@@ -870,9 +793,13 @@ if (typeof module !== 'object') {
 		// 则添加组件状态和历史记录。
 		if (isInDocs && !isHomePage) {
 
+			if (!('path' in dplInfo)) {
+				dplInfo.path = Demo.Dpl.toModulePath(Demo.urlPostfix);
+			}
+
 			// 组件默认使用路径作为副标题。
 			if (!dplInfo.subtitle) {
-				dplInfo.subtitle = Demo.Dpl.toModulePath(Demo.urlPostfix);
+				dplInfo.subtitle = dplInfo.path;
 			}
 
 			Demo.Page.addDplHistory(Demo.urlPostfix);
@@ -888,9 +815,9 @@ if (typeof module !== 'object') {
 		html += '<a href="javascript://常用文档" onclick="Demo.Page.showDropDown(\'demo-toolbar-doc\', 1);return false;" onmouseover="Demo.Page.showDropDown(\'demo-toolbar-doc\')" onmouseout="Demo.Page.hideDropDown()" accesskey="D">文档' + space + '▾</a> | <a href="javascript://常用工具" onclick="Demo.Page.showDropDown(\'demo-toolbar-tool\', 1);return false;" onmouseover="Demo.Page.showDropDown(\'demo-toolbar-tool\')" onclick="Demo.Page.showDropDown(\'demo-toolbar-tool\', 1);return false;" onmouseout="Demo.Page.hideDropDown()" accesskey="T">工具' + space + '▾</a> | <a href="javascript://快速打开其他组件" onmouseover="Demo.Page.showDropDown(\'demo-toolbar-goto\')" onclick="Demo.Page.showDropDown(\'demo-toolbar-goto\', 1);return false;" onmouseout="Demo.Page.hideDropDown()" accesskey="G">转到' + space + '▾</a> | ';
 
 		if (Demo.local && isInDocs && isHomePage) {
-			html += '<a href="' + Demo.server + configs.apps + '/server/dplmanager.njs?action=updatelist&postback=' + encodeURIComponent(location.href) + ' " title="刷新组件列表缓存" accesskey="H">刷新列表</a>';
+			html += '<a href="' + configs.serverBaseUrl + configs.apps + '/tools/dpl/server/dplmanager.njs?action=updatelist&postback=' + encodeURIComponent(location.href) + ' " title="刷新组件列表缓存" accesskey="H">刷新列表</a>';
 		} else {
-			html += '<a href="' + Demo.baseUrl + configs.docs + '/index.html" title="返回组件列表" accesskey="H">返回列表</a>';
+			html += '<a href="' + Demo.baseUrl + configs.examples + '/index.html" title="返回组件列表" accesskey="H">返回列表</a>';
 		}
 
 		html += '</nav></aside>';

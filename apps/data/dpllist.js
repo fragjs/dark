@@ -1,3 +1,1 @@
-﻿var DplList = {
-	"test": { "status": "complete", "name": "测试组件" }
-};
+var DplList={"examples":{"core/base.html":{"status":"plan","name":"测试组件"},"core/base2.html":{"status":"plan","name":"测试组件"},"core/base5.html":{"status":"plan","name":"测试组件"},"dom/base.html":{"status":"obsolete","name":"啊啊啊啊"},"dom/base2.html":{"status":"plan","name":"测试组件"},"dom/base3.html":{"status":"plan","name":"测试组件"},"fx/aa.html":{"status":"plan","name":"特效"}},"src":{"core/base.css":".css","core/base.js":".js","core/base2.css":".css","core/base2.js":".js","core/base5.css":".css","core/base5.js":".js","dom/base.css":".css","dom/base.js":".js","dom/base2.js":".js","dom/base3.css":".css","dom/base3.js":".js","fx/aa.css":".css","fx/aa.js":".js"}};

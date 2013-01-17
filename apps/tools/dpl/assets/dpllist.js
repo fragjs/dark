@@ -1,71 +1,60 @@
 ﻿
-Demo.DplList = {
+Demo.Dpl.submitForm = function (formElem, redirectTo) {
+	var form = Dom.get(formElem);
+	var path = form.find('[name=path]').getText();
+	var name = form.find('[name=title]').getText();
+	var hasError = false;
 
-	addDpl: function (parentNode, key) {
-		parentNode.innerHTML = '<form action="' + Demo.Configs.rootUrl + Demo.Configs.apiPath + 'dplmanager.njs" method="GET"><input type="hidden" name="postback" value=""><input type="text" name="category" class="x-textbox textbox-category" placeholder="组件分类"> <input type="text" name="name" class="x-textbox textbox-name" placeholder="组件名"> <input type="text" name="title" class="x-textbox textbox-name" placeholder="(可选)组件标题"><input type="hidden" name="action" value="create"><input type="hidden" name="module" value="' + key + '"> <input type="button" class="x-button x-button-info" value="添加并转到" onclick="Demo.DplList.submitForm(this.parentNode, true)"> <input type="button" class="x-button" value="添加" onclick="Demo.DplList.submitForm(this.parentNode, false)"></form>';
+	form.query('.x-textbox-error').removeClass('x-textbox-error');
 
-		var form = Dom.get(parentNode);
-
-		var suggest = new Suggest(form.find('[name=category]'));
-		a = suggest
-		suggest.getSuggestItems = function (text) {
-			var r = [];
-			for (var category in Demo.DplList.tree[key]) {
-				if (category.toLowerCase().indexOf(text.toLowerCase()) !== -1) {
-					r.push(category);
-				}
-			}
-
-			return r;
-		};
-
-		var suggest2 = new Suggest(form.find('[name=name]'));
-
-		suggest2.getSuggestItems = function (text) {
-			var r = [];
-			for (var category in (Demo.DplList.tree[key] || {})[form.find('[name=category]').getText()]) {
-				if (category.toLowerCase().indexOf(text.toLowerCase()) !== -1) {
-					r.push(category);
-				}
-			}
-
-			return r;
-		};
-
-	},
-
-	submitForm: function (formElem, redirectTo) {
-		var form = Dom.get(formElem);
-		var module = form.find('[name=module]').getText();
-		var category = form.find('[name=category]').getText();
-		var name = form.find('[name=name]').getText();
-		var hasError = false;
-
-		form.query('.x-textbox-error').removeClass('x-textbox-error');
-
-		if (!category) {
-			hasError = true;
-			form.find('[name=category]').addClass('x-textbox-error');
-		}
-
-		if (!name) {
-			hasError = true;
-			form.find('[name=name]').addClass('x-textbox-error');
-		}
-
-		if (hasError) {
-			return;
-		}
-
-		if (!(Demo.DplList.tree[module] || {})[category] && !confirm('分类 ' + category + ' 不存在。是否创建分类?')) {
-			return;
-		}
-
-		var title = form.find('[name=title]').getText();
-		form.find('[name=postback]').setText(redirectTo ? Demo.getDemoUrl(module + '.' + category + '.' + name) : location.href);
-
-		form.submit();
+	if (!path) {
+		hasError = true;
+		form.find('[name=path]').addClass('x-textbox-error');
 	}
+
+	if (hasError) {
+		return;
+	}
+
+	form.find('[name=postback]').setText(redirectTo ? "" : location.href);
+
+	form.submit();
+
+};
+
+Demo.Dpl.add = function (parentNode) {
+	parentNode.innerHTML = '<form action="' + Demo.Configs.serverBaseUrl + Demo.Configs.apps + '/tools/dpl/server/dplmanager.njs" method="GET"><input type="hidden" name="postback" value=""><input type="text" name="path" class="x-textbox textbox-path" placeholder="组件完整路径"> <input type="text" name="title" class="x-textbox textbox-name" placeholder="(可选)组件名字"> <input type="hidden" name="action" value="create"> <select class="x-textbox" name="tpl"><option value="jscss">js+css组件</option><option value="js">js组件</option><option value="css">css组件</option><option value="docs">组件文档</option></select> <input type="button" class="x-button x-button-info" value="添加并转到" onclick="Demo.Dpl.submitForm(this.parentNode, true)"> <input type="button" class="x-button" value="添加" onclick="Demo.Dpl.submitForm(this.parentNode, false)"></form>';
+
+	var form = Dom.get(parentNode);
+
+	var suggest = new Suggest(form.find('[name=path]').focus());
+	
+	suggest.getSuggestItems = function (text) {
+
+		var r = [];
+
+		Demo.Dpl.tree = Demo.Dpl.tree || Demo.Dpl.listToTree(DplList.src);
+
+		if (!text) {
+			for (var category in Demo.Dpl.tree) {
+				r.push(category + "/");
+			}
+		} else if (text.indexOf('/') < 0) {
+			for (var category in Demo.Dpl.tree) {
+				if (category.toLowerCase().indexOf(text.toLowerCase()) !== -1) {
+					r.push(category + "/");
+				}
+			}
+		} else {
+			for (var category in DplList.src) {
+				if (category.toLowerCase().indexOf(text.toLowerCase()) !== -1) {
+					r.push(category.replace(/(-[\.\d]+)?\.\w+$/, ""));
+				}
+			}
+		}
+
+		return r.unique();
+	};
 
 };
 
@@ -79,98 +68,115 @@ Demo.Dpl.listToTree = function (list) {
 		
 		slash = path.lastIndexOf('/');
 
+		// 删除扩展名、版本号。
 		category = slash < 0 ? '全局' : path.substr(0, slash);
+		fileNameWithoutExtension = (slash < 0 ? path : path.substr(slash + 1)).replace(/(-[\.\d]+)?\.\w+$/, "");
 
 		if(!tree[category]) {
 			tree[category] = {};
 		}
 
-		tree[category][slash < 0 ? path : path.substr(slash + 1)] = path;
+		if (!tree[category][fileNameWithoutExtension]) {
+			tree[category][fileNameWithoutExtension] = path;
+		}
+
+	}
+
+	// 如果一个分类下存在主页，且有超过三级的目录，则降级为二级目录。
+	for (path in tree) {
+		if (tree[path].index) {
+			slash = path.lastIndexOf('/');
+
+			if (slash >= 0) {
+				category = path.substr(0, slash);
+				fileNameWithoutExtension = path.substr(slash + 1);
+
+				if (!tree[category]) {
+					tree[category] = {};
+				}
+
+				if (!tree[category][fileNameWithoutExtension]) {
+					tree[category][fileNameWithoutExtension] = tree[path].index;
+				}
+
+				delete tree[path];
+
+			}
+		}
 	}
 
 	return tree;
 };
 
-Demo.writeDplList = function (values) {
+Demo.writeDplList = function () {
 
-	Demo.DplList.list = DplList;
-	Demo.DplList.tree = Demo.listToTree(DplList);
-
-	var list = Demo.DplList.list, tree = Demo.DplList.tree, key, a, ai, b, bi, c, dplInfo, html = '', html2, all, finish,
-    	from = document.referrer || "",
-        counts = {},
-    	column = 4;
-
-	for (key in values) {
-
-		finish = all = 0;
-		html2 = '';
+	var list = DplList.examples,
+		tree = Demo.Dpl.listToTree(list),
+		from = document.referrer || "",
+		html = "",
+		html2 = "",
+		url,
+		category,
+		data,
+		name,
+		info,
 		counts = {};
 
-		a = tree[key];
+	html += '<article class="demo">';
 
-		for (ai in a) {
+	if (Demo.local)
+		html += '<nav class="demo demo-toolbar" style="margin-top:-40px;"><a href="javascript://创建一个新的组件" class="x-linkbutton" onclick="Demo.Dpl.add(this.parentNode)">✚ 创建组件</a></nav>';
 
-			html2 += '<section class="demo"><h3 class="demo">' + ai + '</h3><ul class="list demo">';
+	for (category in tree) {
+		data = tree[category];
 
-			b = a[ai];
+		html += '<section class="demo"><h3 class="demo" style="margin-top:0;">' + category + '</h3><ul class="demo demo-plain">';
 
-			for (bi in b) {
+		for (name in data) {
 
-				c = b[bi];
+			info = list[data[name]];
 
-				dplInfo = list[c];
+			url = Demo.baseUrl + Demo.Configs.examples + "/" + data[name];
 
-				var url = Demo.getDemoUrl(c);
+			html += '<li style="margin:0;list-style:disc inside;color:#E2E2EB;font-size:14px;line-height:24px;height:24px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;"><a class="demo status-' + info.status + (from === url ? ' current' : '') + '" href="' + url + '" title="' + name + '&#13;&#10;版本：' + (info.version || "1.0") + '&#13;&#10;名字：' + info.name + '&#13;&#10;状态：' + (Demo.Configs.status[info.status] || '已完成') + '">' + name + '</a><small style="color: #999999;"> - ' + info.name + '</small></li>';
 
-				html2 += '<li><a href="' + url + '" class="demo status-' + dplInfo.status + (from === url ? ' current' : '') + '" title="状态: ' + (Demo.Configs.status[dplInfo.status] || '已完成') + '">' + bi + '</a>' + (!dplInfo.name || dplInfo.name === bi ? '' : '<small title="' + dplInfo.name + '"> - ' + dplInfo.name + '</small>') + '</li>';
-
-				switch (dplInfo.status) {
-					case 'ok':
-					case 'beta':
-					case 'complete':
-						finish++;
-
-						// fall through
-					case 'develop':
-					case 'plan':
-						all++;
-					case 'obsolete':
-						if (!counts[dplInfo.status]) {
-							counts[dplInfo.status] = 1;
-						} else {
-							counts[dplInfo.status]++;
-						}
-				}
-
+			if (!counts[info.status]) {
+				counts[info.status] = 1;
+			} else {
+				counts[info.status]++;
 			}
-
-			html2 += '</ul></section>';
-
 
 		}
 
-		if (html2) {
-			html += '<article class="demo">';
-
-			if (Demo.local)
-				html += '<nav class="demo demo-toolbar"><a href="javascript://在' + key + '下添加一个组件" title="在' + key + '下添加一个组件" class="x-linkbutton" onclick="Demo.DplList.addDpl(this.parentNode, \'' + key + '\')">✚ 添加组件</a></nav>';
-
-			html += '<h2 class="demo">' + key + '(' + values[key] + ')' + '<small title="共: ' + (all + (counts.obsolete || 0));
-
-			for (var ai in counts) {
-				b = counts[ai];
-
-				html += "&#13;&#10;" + Demo.Configs.status[ai] + ": " + b;
-			}
-
-			html += '">' + finish + '/' + all + '</small></h2>' + html2 + '</article>';
-		}
+		html += '</ul></section>';
 
 	}
 
+	html += '</article>';
+
 	document.write(html);
 
-	Demo.waterFall(column);
+	Demo.waterFall(4);
+
+	var toolbar = document.getElementById('demo-toolbar');
+
+	if (toolbar) {
+		var next = toolbar.nextSibling;
+		if (next.tagName !== "H1") {
+			next = next.nextSibling;
+		}
+		
+		html = '<small title="';
+		data = 0;
+
+		for (name in counts) {
+			data += counts[name];
+			html += Demo.Configs.status[name] + ": " + counts[name] + "&#13;&#10;";
+		}
+
+		html += '全部: ' + data + '">' + ((counts.ok || 0) + (counts.complete || 0)) + '/' + data + '</small>';
+
+		next.innerHTML += html;
+	}
 
 };

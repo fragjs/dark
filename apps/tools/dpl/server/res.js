@@ -18,10 +18,10 @@ function redirect(context, url) {
 
     if (url) {
 
-        if (/^file:\/\/\//.test(url)) {
-            url = url.replace(/^file:\/\/\//, '');
-            var System = require('./system');
-            url = url.replace(System.Configs.physicalPath.replace(/\\/g, "/"), System.Configs.rootUrl);
+    	if (!/^http:/.test(url)) {
+    		url = url.replace(/^file:\/\/\//, '').replace(/\\/g, "/");
+            var Demo = require('./demo');
+            url = url.replace(Demo.basePath.replace(/\\/g, "/"), Demo.Configs.serverBaseUrl.replace(/\/$/, ""));
             context.response.redirect(url);
 
         } else {
