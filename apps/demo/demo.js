@@ -416,7 +416,7 @@ if (typeof module !== 'object') {
 				case "demo-toolbar-goto":
 					dropDown.className = 'demo-toolbar-dropdown';
 					dropDown.style.width = '300px';
-					dropDown.innerHTML = '<input style="width:290px;padding:5px;border:0;border-bottom:1px solid #9B9B9B;" type="text" onfocus="this.select()" placeholder="输入组件名/路径/描述..."><div class="demo-toolbar-dropdown-menu" style="_height: 300px;_width:300px;word-break:break-all;max-height:300px;overflow:auto;"></div>';
+					dropDown.innerHTML = '<input style="width:290px;padding:5px;border:0;border-bottom:1px solid #9B9B9B;" type="text" onfocus="this.select()" placeholder="搜索组件路径/名字..."><div class="demo-toolbar-dropdown-menu" style="_height: 300px;_width:300px;word-break:break-all;max-height:300px;overflow:auto;"></div>';
 					dropDown.defaultButton = dropDown.firstChild;
 					dropDown.defaultButton.onkeydown = function (e) {
 						e = e || window.event;
@@ -603,7 +603,7 @@ if (typeof module !== 'object') {
 		exploreSource: function () {
 			if (Demo.local) {
 				var img = new Image();
-				img.src = Demo.Configs.serverbaseUrl + "server/explorer.njs?path=" + encodeURIComponent(location.pathname) + "&_=" + (+new Date()) + Math.random();
+				img.src = Demo.Configs.serverBaseUrl + Demo.Configs.apps + "/server/explorer.njs?path=" + encodeURIComponent(location.pathname) + "&_=" + (+new Date()) + Math.random();
 			} else {
 				location.href = 'view-source:' + location.href;
 			}
