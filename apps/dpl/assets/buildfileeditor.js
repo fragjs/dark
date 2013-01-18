@@ -2,6 +2,8 @@
 
 var DplBuilder = {
 
+	current: null,
+
     addDpl: function () {
         var type = Dom.find('.newDpl select').getText();
         var path = Dom.find('.newDpl input.x-textbox').getText();
@@ -25,21 +27,22 @@ var DplBuilder = {
         }
     },
 
-    clearDpls: function () {
+    clearList: function () {
         if (confirm('确定清空列表吗?')) {
-            DplFile.dpls.length = 0;
+        	DplBuilder.current.list.length = 0;
             this.updateDpls();
         }
     },
 
-    updateList: function (list) {
+    updateList: function () {
 
+    	var list = DplBuilder.current.list;
     	var form = Dom.find('.dpls');
 
     	var html = '';
 
     	if (t.length) {
-    		html += '<div class="demo demo-toolbar"><a onclick="DplBuilder.clearDpls();" href="javascript://按顺序执行全部测试用例">清空列表</a></div>';
+    		html += '<div class="demo demo-toolbar"><a onclick="DplBuilder.clearList();" href="javascript://按顺序执行全部测试用例">清空列表</a></div>';
     	}
 
     	for (var i = 0; i < list.length; i++) {
@@ -53,7 +56,7 @@ var DplBuilder = {
     		if (i < t.length - 1)
     			html += ' | <a class="demo-viewsource-toggle" href="javascript://下移生成的位置" onclick="DplBuilder.moveDpl(' + i + ', true);">下移</a>';
 
-    		html += ' | <a class="demo-viewsource-toggle" href="javascript://删除对当前模块的引用" onclick="DplBuilder.deleteDpl(' + i + '); return false;">删除</a></nav><a class="demo demo-mono" target="_blank" href="' + dpl.docPath + '">';
+    		html += ' | <a class="demo-viewsource-toggle" href="javascript://删除对当前模块的引用" onclick="DplBuilder.deleteDpl(' + i + '); return false;">删除</a></nav><a class="demo demo-mono" target="_blank" href="' + Demo.basePath + Demo.Configs.src + dpl.path + '">';
 
     		if (dpl.type == "exclude") {
     			html += '<del>[排除]' + dpl.path + '</del>';
@@ -82,7 +85,10 @@ var DplBuilder = {
     		js: 'aaaa',
     		css: 'gsdfsdf',
     		images: 'fsadasdsadasd',
-			list: []
+    		list: [
+				{ type: 'include', path: 'core/base.js' },
+				{ type: 'include', path: 'dom/base.js' }
+    		]
     	};
 
     	DplBuilder.loadBuildFile(window.__bpm);
@@ -184,30 +190,29 @@ var DplBuilder = {
     },
 
     /**
-	 * 将界面上的UI信息收集起来，放入 DplFile 对象。
+	 * 将界面上的UI信息收集起来，放入 BuildFile 对象。
 	 */
-    saveDplFile: function () {
+    saveBuildFile: function (configs) {
 
         var form = Dom.find('.props');
-        var t = DplFile;
 
-        t.path = form.find('[name=path]').getText();
-        t.properties.base = form.find('[name=base]').getText();
-        t.properties.title = form.find('[name=title]').getText();
-        t.properties.js = form.find('[name=js]').getText();
-        t.properties.css = form.find('[name=css]').getText();
-        t.properties.images = form.find('[name=images]').getText();
+        //configs.path = form.find('[name=path]').getText();
+        //t.properties.base = form.find('[name=base]').getText();
+        //t.properties.title = form.find('[name=title]').getText();
+        configs.js = form.find('[name=js]').getText();
+        configs.css = form.find('[name=css]').getText();
+        configs.images = form.find('[name=images]').getText();
 
-        t.requires = form.find('[name=requires]').getText().trim();
-        t.requires = t.requires ? t.requires.split(/\s*;\s*/) : [];
+        //t.requires = form.find('[name=requires]').getText().trim();
+        //t.requires = t.requires ? t.requires.split(/\s*;\s*/) : [];
 
-        t.properties.parseMacro = form.find('[name=parseMacro]').getAttr('checked');
-        t.properties.defines = form.find('[name=defines]').getText();
-        t.properties.removeTrace = form.find('[name=removeTrace]').getAttr('checked');
-        t.properties.removeAssert = form.find('[name=removeAssert]').getAttr('checked');
-        t.properties.removeConsole = form.find('[name=removeConsole]').getAttr('checked');
-        t.properties.addHeader = form.find('[name=addHeader]').getAttr('checked');
-        t.properties.resolveRefs = form.find('[name=resolveRefs]').getAttr('checked');
+        //t.properties.parseMacro = form.find('[name=parseMacro]').getAttr('checked');
+        //t.properties.defines = form.find('[name=defines]').getText();
+        configs.removeTrace = form.find('[name=removeTrace]').getAttr('checked');
+        configs.removeAssert = form.find('[name=removeAssert]').getAttr('checked');
+        configs.removeConsole = form.find('[name=removeConsole]').getAttr('checked');
+        configs.addHeader = form.find('[name=addHeader]').getAttr('checked');
+        configs.resolveRefs = form.find('[name=resolveRefs]').getAttr('checked');
 
     },
 
