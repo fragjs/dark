@@ -60,7 +60,7 @@ function initConfigs(buildSrc) {
 		if(baseName) {
 			configs.js = baseName[1] + ".js";
 			configs.css = baseName[1] + ".css";
-		} else 
+		} else {
 			configs.js = buildSrc.replace(/\.\w+$/, "-build.js");
 			configs.css = buildSrc.replace(/\.\w+$/, "-build.css");
 		}

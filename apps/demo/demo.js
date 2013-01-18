@@ -45,8 +45,8 @@ Demo.Configs = {
 	 * 工具的下拉菜单 HTML 模板。
 	 */
 	tool: '<a href="~/apps/dpl/dplfilelist.html" target="_blank">组件合成工具</a>\
-                <a href="~/assets/dpl/codehelper.html" target="_blank">代码工具</a>\
-                <a href="~/assets/dpl/specialcharacters.html" target="_blank">特殊字符</a>\
+                <a href="~/apps/tools/codehelper/index.html" target="_blank">代码工具</a>\
+                <a href="~/apps/tools/codesegments/specialcharacters.html" target="_blank">特殊字符</a>\
                 <!--<a href="~/resources/index.html#tool" target="_blank">更多工具</a>-->\
                 <a href="javascript://浏览当前页面的源文件" onclick="Demo.Page.exploreSource();" style="border-top: 1px solid #EBEBEB;">浏览源文件</a>\
                 <a href="javascript://显示或隐藏页面中自动显示的源码片段" onclick="Demo.Page.toggleSources()">切换代码</a>',
