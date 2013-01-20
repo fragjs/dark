@@ -14,6 +14,29 @@
 			dest[b] = src[b];
 		return dest;
 	}
+
+    /**
+	 * Get the current script url of specified script or link node.
+	 */
+	function getCurrentPath() {
+
+	    var url = include.currentPath;
+
+	    if (!url) {
+	        try {
+	            var scripts = document.getElementsByTagName("script");
+	            scripts = scripts[scripts.length - 1];
+	            if (scripts.src)
+	                url = getAbsoluteUrl(scripts, 'src');
+	            else
+	                url = location.protocol + '//' + location.host + location.pathname;
+	        } catch (e) {
+	            url = "";
+	        }
+        }
+
+	    return url.replace(/\/[^\/]*$/, "");
+	}
 	
 	/**
 	 * Get the absolute url of specified script or link node.
@@ -42,28 +65,20 @@
 	}
 	
 	extend(include, {
+
+        boot: 1.0,
 		
 		/**
 		 * An array to save loaded paths.
 		 */
-		loaded: [],
+	    loaded: [],
+
+	    getCurrentPath: getCurrentPath,
 		
 		/**
 		 * The root path used by include. Default to the parent directory of boot.js.The path should not be end with "/".
 		 */
-		basePath: (function () {
-			try {
-				var scripts = document.getElementsByTagName("script");
-				return getAbsoluteUrl(scripts[scripts.length - 1], 'src').replace(/\/[^\/]*$/, "");
-			} catch (e) {
-				return "";
-			}
-		})(),
-		
-		/**
-		 * The current path used by include. Default to the directory of current page.The path should not be end with "/".
-		 */
-		currentPath: location.protocol + '//' + location.host + location.pathname.replace(/\/[^\/]*$/, ""),
+	    basePath: getCurrentPath(),
 	
 		/**
 		 * Get the actually url of specified module path.
@@ -72,8 +87,8 @@
 			
 			// If modulePath starts with '~', replace '~' with current html path.
 			// If modulePath is relative path. Concat modulePath with basePath.
-			if(modulePath.substr(0, 2) === '~/') {
-				modulePath = modulePath.replace('~/', include.currentPath + "/");
+			if(modulePath.charAt(0) === '.') {
+			    modulePath = include.getCurrentPath() + "/" + modulePath;
 			} else if(!/:\/\//.test(modulePath)) {
 				modulePath = include.basePath + "/" + modulePath;
 			}
@@ -184,8 +199,9 @@
 				var sourceCode = include.getText(url);
 
 				if (sourceCode) {
+				    var oldPath = include.currentPath;
+				    include.currentPath = url;
 					try {
-						
 						// Eval code in global context.
 						if (window.execScript) {
 							window.execScript(sourceCode);
@@ -195,7 +211,9 @@
 							window["eval"].call(window, sourceCode);
 						}
 					} catch (e) {
-						trace.error("Script Error: " + url + "\r\n\tMessage: " + e.toString());
+					    trace.error("Script Error: " + url + "\r\n\tMessage: " + e.toString());
+					} finally {
+					    include.currentPath = oldPath;
 					}
 				}
 			},
@@ -632,16 +650,12 @@
 	
 	// Exports Functions
 	
-	extend(window, {
+	extend(window, window.bootjs = {
 		
 		include: include,
-		
 		exclude: exclude,
-		
 		exports: exports,
-		
 		trace: trace,
-		
 		assert: assert
 	
 	});
